@@ -42,6 +42,7 @@ void Simulator::run(const std::string& out_path) {
         "signal",
         "bid",
         "ask",
+        "trader_type",
         "trade_side",
         "trade_price",
         "inventory",
@@ -81,12 +82,16 @@ void Simulator::run(const std::string& out_path) {
             }
         }
 
-        // Choose trader type
+        // Choose which type of counterparty arrives.
         Trader* trader = nullptr;
+        std::string trader_type;
+
         if (rng.bernoulli(cfg_.p_informed)) {
             trader = &informed;
+            trader_type = "informed";
         } else {
             trader = &noise;
+            trader_type = "noise";
         }
 
         Trade tr = trader->respond(q, ms.true_value, rng, cfg_);
@@ -115,6 +120,7 @@ void Simulator::run(const std::string& out_path) {
             to_s(ms.signal),
             to_s(q.bid),
             to_s(q.ask),
+            trader_type,
             side_to_string(tr.side),
             to_s(tr.price),
             std::to_string(st.inventory),
