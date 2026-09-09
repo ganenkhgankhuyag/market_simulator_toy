@@ -48,10 +48,10 @@ public:
 private:
 
     // Copy of the configuration used for this simulation run.
-    Config cfg_;
+    Config m_cfg;
 
     // Which quoting strategy to apply at each timestep.
-    StrategyType strategy_;
+    StrategyType m_strategy;
 };
 
 #endif // SIMULATOR_H

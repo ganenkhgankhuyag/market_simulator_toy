@@ -1,29 +1,29 @@
 #include "strategy.h"
 
 FixedSpreadStrategy::FixedSpreadStrategy(double half_spread)
-    : half_spread_(half_spread) {}
+    : m_half_spread(half_spread) {}
 
 Quote FixedSpreadStrategy::quote(double signal, int /*inventory*/) {
     Quote q;
-    q.bid = signal - half_spread_;
-    q.ask = signal + half_spread_;
+    q.bid = signal - m_half_spread;
+    q.ask = signal + m_half_spread;
     return q;
 }
 
 InventorySkewStrategy::InventorySkewStrategy(double half_spread, double skew_k)
-    : half_spread_(half_spread), skew_k_(skew_k) {}
+    : m_half_spread(half_spread), m_skew_k(skew_k) {}
 
 Quote InventorySkewStrategy::quote(double signal, int inventory) {
     Quote q;
 
-    double shift = skew_k_ * (double)inventory;
+    double shift = m_skew_k * (double)inventory;
 
     // Shift both bid/ask down when inventory is positive,
     // shift both up when inventory is negative.
     double mid = signal;
 
-    q.bid = mid - half_spread_ - shift;
-    q.ask = mid + half_spread_ - shift;
+    q.bid = mid - m_half_spread - shift;
+    q.ask = mid + m_half_spread - shift;
 
     return q;
 }
@@ -31,15 +31,15 @@ Quote InventorySkewStrategy::quote(double signal, int inventory) {
 UncertaintySpreadStrategy::UncertaintySpreadStrategy(double base_half_spread,
                                                      double spread_alpha,
                                                      double signal_noise_std)
-    : base_half_spread_(base_half_spread),
-      spread_alpha_(spread_alpha),
-      signal_noise_std_(signal_noise_std) {}
+    : m_base_half_spread(base_half_spread),
+      m_spread_alpha(spread_alpha),
+      m_signal_noise_std(signal_noise_std) {}
 
 Quote UncertaintySpreadStrategy::quote(double signal, int /*inventory*/) {
     Quote q;
 
     // Wider spread when uncertainty is higher.
-    double half_spread = base_half_spread_ + spread_alpha_ * signal_noise_std_;
+    double half_spread = m_base_half_spread + m_spread_alpha * m_signal_noise_std;
 
     q.bid = signal - half_spread;
     q.ask = signal + half_spread;

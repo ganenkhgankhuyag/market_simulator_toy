@@ -46,7 +46,7 @@ public:
 
 private:
     // Fixed distance from the signal to bid/ask.
-    double half_spread_;
+    double m_half_spread;
 };
 
 // Inventory-skew strategy.
@@ -67,10 +67,10 @@ public:
 
 private:
     // Baseline half-spread around the signal.
-    double half_spread_;
+    double m_half_spread;
 
     // Coefficient controlling how much inventory shifts quotes.
-    double skew_k_;
+    double m_skew_k;
 };
 
 // Uncertainty-aware spread strategy.
@@ -92,13 +92,13 @@ public:
 
 private:
     // Baseline half-spread used when uncertainty is low.
-    double base_half_spread_;
+    double m_base_half_spread;
 
     // Scaling factor for how uncertainty affects spread width.
-    double spread_alpha_;
+    double m_spread_alpha;
 
     // Measure of how noisy the observed signal is.
-    double signal_noise_std_;
+    double m_signal_noise_std;
 };
 
 #endif // STRATEGY_H

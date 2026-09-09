@@ -36,7 +36,7 @@ private:
 
     // Mersenne Twister generator.
     // Stores the full internal state of the RNG.
-    std::mt19937 gen_;
+    std::mt19937 m_gen;
 };
 
 #endif // RNG_H

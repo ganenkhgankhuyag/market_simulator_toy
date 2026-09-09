@@ -19,7 +19,7 @@ std::string side_to_string(TradeSide s) {
 }
 
 Simulator::Simulator(const Config& cfg, StrategyType strategy)
-    : cfg_(cfg), strategy_(strategy) {}
+    : m_cfg(cfg), m_strategy(strategy) {}
 
 void Simulator::run(const std::string& out_path) {
     // Ensure output directory exists
@@ -27,8 +27,8 @@ void Simulator::run(const std::string& out_path) {
         std::filesystem::path(out_path).parent_path()
     );
 
-    RNG rng(cfg_.seed);
-    Market market(cfg_);
+    RNG rng(m_cfg.seed);
+    Market market(m_cfg);
 
     NoiseTrader noise;
     InformedTrader informed;
@@ -52,30 +52,30 @@ void Simulator::run(const std::string& out_path) {
         "risk_adj_pnl"
     });
 
-    for (int t = 1; t <= cfg_.T; t++) {
+    for (int t = 1; t <= m_cfg.T; t++) {
         MarketStep ms = market.step(rng);
 
         Quote q;
 
-        switch (strategy_) {
+        switch (m_strategy) {
             case StrategyType::FixedSpread: {
-                FixedSpreadStrategy strat(cfg_.base_half_spread);
+                FixedSpreadStrategy strat(m_cfg.base_half_spread);
                 q = strat.quote(ms.signal, st.inventory);
                 break;
             }
             case StrategyType::InventorySkew: {
                 InventorySkewStrategy strat(
-                    cfg_.base_half_spread,
-                    cfg_.inventory_skew_k
+                    m_cfg.base_half_spread,
+                    m_cfg.inventory_skew_k
                 );
                 q = strat.quote(ms.signal, st.inventory);
                 break;
             }
             case StrategyType::UncertaintyAware: {
                 UncertaintySpreadStrategy strat(
-                    cfg_.base_half_spread,
-                    cfg_.spread_alpha,
-                    cfg_.signal_noise_std
+                    m_cfg.base_half_spread,
+                    m_cfg.spread_alpha,
+                    m_cfg.signal_noise_std
                 );
                 q = strat.quote(ms.signal, st.inventory);
                 break;
@@ -86,7 +86,7 @@ void Simulator::run(const std::string& out_path) {
         Trader* trader = nullptr;
         std::string trader_type;
 
-        if (rng.bernoulli(cfg_.p_informed)) {
+        if (rng.bernoulli(m_cfg.p_informed)) {
             trader = &informed;
             trader_type = "informed";
         } else {
@@ -94,7 +94,7 @@ void Simulator::run(const std::string& out_path) {
             trader_type = "noise";
         }
 
-        Trade tr = trader->respond(q, ms.true_value, rng, cfg_);
+        Trade tr = trader->respond(q, ms.true_value, rng, m_cfg);
 
         // Update cash/inventory based on trade
         if (tr.side == TradeSide::BuyFromMM) {
@@ -108,7 +108,7 @@ void Simulator::run(const std::string& out_path) {
         double pnl = st.cash + static_cast<double>(st.inventory) * ms.true_value;
 
         double inv_penalty =
-            cfg_.inventory_penalty_lambda *
+            m_cfg.inventory_penalty_lambda *
             static_cast<double>(st.inventory) *
             static_cast<double>(st.inventory);
 

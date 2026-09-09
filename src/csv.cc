@@ -1,6 +1,6 @@
 #include "csv.h"
 
-CSVWriter::CSVWriter(const std::string& path) : out_(path) {}
+CSVWriter::CSVWriter(const std::string& path) : m_out(path) {}
 
 std::string CSVWriter::escape(const std::string& s) {
     bool needs_quotes = false;
@@ -33,8 +33,8 @@ void CSVWriter::write_header(const std::vector<std::string>& cols) {
 
 void CSVWriter::write_row(const std::vector<std::string>& cells) {
     for (size_t i = 0; i < cells.size(); i++) {
-        if (i) out_ << ",";
-        out_ << escape(cells[i]);
+        if (i) m_out << ",";
+        m_out << escape(cells[i]);
     }
-    out_ << "\n";
+    m_out << "\n";
 }
