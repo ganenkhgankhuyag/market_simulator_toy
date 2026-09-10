@@ -1,7 +1,54 @@
 import csv
 import sys
 import re
+import math
 from typing import Optional
+
+# Baseline model parameters used in the fixed spread experiment.
+BASE_HALF_SPREAD = 1.0
+P_INFORMED = 0.40
+P_TRADE_NOISE = 0.30
+
+def normal_density(z: float) -> float:
+    return (
+        1.0 / math.sqrt(2.0 * math.pi)
+    ) * math.exp(-(z * z) / 2.0)
+
+def normal_cdf(z: float) -> float:
+    return 0.5 * (1.0 + math.erf(z / math.sqrt(2.0)))
+
+def predicted_fixed_edge(noise: float) -> float:
+
+    h = BASE_HALF_SPREAD
+
+    z = h / noise
+
+    right_tail = 1.0 - normal_cdf(z)
+
+    noise_trade_probability = (
+        (1.0 - P_INFORMED) * P_TRADE_NOISE
+    )
+
+    informed_trade_probability = (
+        2.0 * P_INFORMED * right_tail
+    )
+
+    adverse_selection = (
+        2.0
+        * P_INFORMED
+        * noise
+        * normal_density(z)
+    )
+
+    total_trade_probability = (
+        noise_trade_probability
+        + informed_trade_probability
+    )
+
+    return (
+        h
+        - adverse_selection / total_trade_probability
+    )
 
 def parse_file_info(path: str) -> tuple[str, Optional[float], Optional[int]]:
     """
@@ -117,6 +164,8 @@ def write_repeated_summary_csv(out_path: str, results: list[dict]) -> None:
         "avg_max_abs_inventory",
         "avg_num_trades",
         "avg_edge_per_trade",
+        "predicted_edge",
+        "difference",
     ]
 
     with open(out_path, "w", newline="") as f:
@@ -183,6 +232,15 @@ def summarize_repeated_runs(results: list[dict]) -> list[dict]:
             total_edge / total_trades if total_trades else 0.0
         )
 
+        predicted_edge = ""
+        difference = ""
+
+        # We have only derived the mathematical prediction
+        # for the fixed spread strategy so far.
+        if strategy == "fixed":
+            predicted_edge = predicted_fixed_edge(noise)
+            difference = avg_edge_per_trade - predicted_edge
+
         summaries.append({
             "strategy": strategy,
             "noise": noise,
@@ -192,6 +250,8 @@ def summarize_repeated_runs(results: list[dict]) -> list[dict]:
             "avg_max_abs_inventory": avg_max_abs_inventory,
             "avg_num_trades": avg_num_trades,
             "avg_edge_per_trade": avg_edge_per_trade,
+            "predicted_edge": predicted_edge,
+            "difference": difference,
         })
 
     return summaries
