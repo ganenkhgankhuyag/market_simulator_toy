@@ -107,9 +107,94 @@ def write_summary_csv(out_path: str, results: list[dict]) -> None:
         for row in results:
             w.writerow(row)
 
+def write_repeated_summary_csv(out_path: str, results: list[dict]) -> None:
+    fields = [
+        "strategy",
+        "noise",
+        "number_of_runs",
+        "avg_final_pnl",
+        "avg_final_risk_adj_pnl",
+        "avg_max_abs_inventory",
+        "avg_num_trades",
+        "avg_edge_per_trade",
+    ]
+
+    with open(out_path, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=fields)
+        w.writeheader()
+
+        for row in results:
+            w.writerow(row)
+
 def is_noise_grid_row(r: dict) -> bool:
 
     return r["strategy"] in ("fixed", "skew", "uncert") and r["noise"] != ""
+
+def summarize_repeated_runs(results: list[dict]) -> list[dict]:
+    """
+    Groups repeated runs that use the same strategy and noise level,
+    then calculates one summary row for each group.
+    """
+
+    groups = {}
+
+    # Group runs by strategy and noise level.
+    for result in results:
+        if not is_noise_grid_row(result):
+            continue
+
+        key = (result["strategy"], float(result["noise"]))
+
+        if key not in groups:
+            groups[key] = []
+
+        groups[key].append(result)
+
+    summaries = []
+
+    # Each group contains all repeated runs for one strategy/noise pair.
+    for (strategy, noise), runs in groups.items():
+
+        number_of_runs = len(runs)
+
+        avg_final_pnl = (
+            sum(run["final_pnl"] for run in runs) / number_of_runs
+        )
+
+        avg_final_risk_adj_pnl = (
+            sum(run["final_risk_adj_pnl"] for run in runs) / number_of_runs
+        )
+
+        avg_max_abs_inventory = (
+            sum(run["max_abs_inventory"] for run in runs) / number_of_runs
+        )
+
+        total_trades = sum(run["num_trades"] for run in runs)
+
+        avg_num_trades = total_trades / number_of_runs
+
+        # Combine execution edge across all trades from all repeated runs.
+        total_edge = sum(
+            run["avg_edge_per_trade"] * run["num_trades"]
+            for run in runs
+        )
+
+        avg_edge_per_trade = (
+            total_edge / total_trades if total_trades else 0.0
+        )
+
+        summaries.append({
+            "strategy": strategy,
+            "noise": noise,
+            "number_of_runs": number_of_runs,
+            "avg_final_pnl": avg_final_pnl,
+            "avg_final_risk_adj_pnl": avg_final_risk_adj_pnl,
+            "avg_max_abs_inventory": avg_max_abs_inventory,
+            "avg_num_trades": avg_num_trades,
+            "avg_edge_per_trade": avg_edge_per_trade,
+        })
+
+    return summaries
 
 def main():
     if len(sys.argv) < 2:
@@ -125,14 +210,15 @@ def main():
     write_summary_csv("data/summary.csv", results)
     print("Wrote data/summary.csv")
 
-    grid = [r for r in results if is_noise_grid_row(r)]
+    # Combine repeated runs into one row for each strategy and noise level.
+    grid = summarize_repeated_runs(results)
 
     def sort_key(r: dict):
         return (float(r["noise"]), r["strategy"])
 
     grid.sort(key=sort_key)
 
-    write_summary_csv("data/noise_grid_summary.csv", grid)
+    write_repeated_summary_csv("data/noise_grid_summary.csv", grid)
     print("Wrote data/noise_grid_summary.csv")
 
 if __name__ == "__main__":
