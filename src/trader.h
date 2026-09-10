@@ -46,6 +46,7 @@ public:
     // POST: returns a Trade describing whether a trade occurred,
     //       and at what price if it did.
     virtual Trade respond(const Quote& q,
+                          double signal,
                           double true_value,
                           RNG& rng,
                           const Config& cfg) = 0;
@@ -59,6 +60,7 @@ public:
     // POST: with some probability, returns a buy or sell trade at
     //       the quoted price; otherwise returns no trade.
     Trade respond(const Quote& q,
+                  double signal,
                   double true_value,
                   RNG& rng,
                   const Config& cfg) override;
@@ -73,6 +75,7 @@ public:
     // POST: trades if and only if the quote is mispriced relative
     //       to true_value; otherwise returns no trade.
     Trade respond(const Quote& q,
+                  double signal,
                   double true_value,
                   RNG& rng,
                   const Config& cfg) override;

@@ -3,7 +3,7 @@
 // Noise trader:
 // - With probability p_trade_noise, they trade
 // - If they trade, they randomly buy or sell
-Trade NoiseTrader::respond(const Quote& q, double /*true_value*/, RNG& rng, const Config& cfg) {
+Trade NoiseTrader::respond(const Quote& q, double /*signal*/, double /*true_value*/, RNG& rng, const Config& cfg) {
     Trade t;
 
     if (!rng.bernoulli(cfg.p_trade_noise)) {
@@ -27,7 +27,7 @@ Trade NoiseTrader::respond(const Quote& q, double /*true_value*/, RNG& rng, cons
 // - If ask is below true value, they buy (MM sells too cheap)
 // - If bid is above true value, they sell (MM buys too expensive)
 // Otherwise no trade.
-Trade InformedTrader::respond(const Quote& q, double true_value, RNG& /*rng*/, const Config& /*cfg*/) {
+Trade InformedTrader::respond(const Quote& q, double /*signal*/, double true_value, RNG& /*rng*/, const Config& /*cfg*/) {
     Trade t;
 
     if (q.ask < true_value) {

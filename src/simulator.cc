@@ -94,7 +94,7 @@ void Simulator::run(const std::string& out_path) {
             trader_type = "noise";
         }
 
-        Trade tr = trader->respond(q, ms.true_value, rng, m_cfg);
+        Trade tr = trader->respond(q, ms.signal, ms.true_value, rng, m_cfg);
 
         // Update cash/inventory based on trade
         if (tr.side == TradeSide::BuyFromMM) {
