@@ -64,7 +64,7 @@ int main() {
             // Fixed spread baseline.
             // PRE: cfg is defined and contains the parameters for this run.
             // POST: writes one CSV file containing timestep-by-timestep log data.
-            Simulator fixed_spread_sim(cfg, StrategyType::FixedSpread);
+            Simulator fixed_spread_sim(cfg, StrategyType::FixedSpread, UninformedTraderType::Noise);
 
             std::string fixed_spread_path =
                 "data/fixed_noise_" + clean(ns) +
@@ -81,7 +81,7 @@ int main() {
             // PRE: cfg is defined and contains the same seed and noise level
             //      used by the fixed spread strategy for this run.
             // POST: writes one CSV file containing timestep-by-timestep log data.
-            Simulator inventory_skew_sim(cfg, StrategyType::InventorySkew);
+            Simulator inventory_skew_sim(cfg, StrategyType::InventorySkew, UninformedTraderType::Noise);
 
             std::string inventory_skew_path =
                 "data/skew_noise_" + clean(ns) +
@@ -101,7 +101,8 @@ int main() {
             // POST: writes one CSV file containing timestep-by-timestep log data.
             Simulator uncertainty_spread_sim(
                 cfg,
-                StrategyType::UncertaintyAware
+                StrategyType::UncertaintyAware,
+                UninformedTraderType::Noise
             );
 
             std::string uncertainty_spread_path =

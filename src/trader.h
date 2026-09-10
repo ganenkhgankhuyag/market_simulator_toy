@@ -66,6 +66,22 @@ public:
                   const Config& cfg) override;
 };
 
+// Price-sensitive uninformed trader.
+// Does not know the true value. Randomly chooses whether it wants
+// to buy or sell, then decides whether to trade based on the quoted
+// price relative to the noisy signal.
+class PriceSensitiveUninformedTrader : public Trader {
+public:
+    // PRE: q, signal, rng, and cfg are defined.
+    // POST: randomly chooses a buy or sell intention, then trades
+    //       with a probability based on how far that quote is from signal.
+    Trade respond(const Quote& q,
+                  double signal,
+                  double true_value,
+                  RNG& rng,
+                  const Config& cfg) override;
+};
+
 // Informed trader.
 // Trades only when the market maker’s quote is favorable compared
 // to the true value, creating adverse selection.

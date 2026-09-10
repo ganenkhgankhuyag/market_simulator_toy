@@ -18,8 +18,14 @@ std::string side_to_string(TradeSide s) {
     return "none";
 }
 
-Simulator::Simulator(const Config& cfg, StrategyType strategy)
-    : m_cfg(cfg), m_strategy(strategy) {}
+Simulator::Simulator(
+    const Config& cfg,
+    StrategyType strategy,
+    UninformedTraderType uninformed_trader
+)
+    : m_cfg(cfg),
+      m_strategy(strategy),
+      m_uninformed_trader(uninformed_trader) {}
 
 void Simulator::run(const std::string& out_path) {
     // Ensure output directory exists
@@ -31,6 +37,7 @@ void Simulator::run(const std::string& out_path) {
     Market market(m_cfg);
 
     NoiseTrader noise;
+    PriceSensitiveUninformedTrader price_sensitive;
     InformedTrader informed;
 
     State st;
@@ -90,8 +97,13 @@ void Simulator::run(const std::string& out_path) {
             trader = &informed;
             trader_type = "informed";
         } else {
-            trader = &noise;
-            trader_type = "noise";
+            if (m_uninformed_trader == UninformedTraderType::PriceSensitive) {
+                trader = &price_sensitive;
+                trader_type = "price_sensitive_uninformed";
+            } else {
+                trader = &noise;
+                trader_type = "noise";
+            }
         }
 
         Trade tr = trader->respond(q, ms.signal, ms.true_value, rng, m_cfg);
