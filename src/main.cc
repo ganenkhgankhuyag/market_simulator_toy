@@ -64,7 +64,7 @@ int main() {
             // Fixed spread baseline.
             // PRE: cfg is defined and contains the parameters for this run.
             // POST: writes one CSV file containing timestep-by-timestep log data.
-            Simulator fixed_spread_sim(cfg, StrategyType::FixedSpread);
+            Simulator fixed_spread_sim(cfg, StrategyType::FixedSpread, UninformedTraderType::Noise);
 
             std::string fixed_spread_path =
                 "data/fixed_noise_" + clean(ns) +
@@ -81,7 +81,7 @@ int main() {
             // PRE: cfg is defined and contains the same seed and noise level
             //      used by the fixed spread strategy for this run.
             // POST: writes one CSV file containing timestep-by-timestep log data.
-            Simulator inventory_skew_sim(cfg, StrategyType::InventorySkew);
+            Simulator inventory_skew_sim(cfg, StrategyType::InventorySkew, UninformedTraderType::Noise);
 
             std::string inventory_skew_path =
                 "data/skew_noise_" + clean(ns) +
@@ -101,7 +101,8 @@ int main() {
             // POST: writes one CSV file containing timestep-by-timestep log data.
             Simulator uncertainty_spread_sim(
                 cfg,
-                StrategyType::UncertaintyAware
+                StrategyType::UncertaintyAware,
+                UninformedTraderType::Noise
             );
 
             std::string uncertainty_spread_path =
@@ -114,6 +115,51 @@ int main() {
                       << " -> " << uncertainty_spread_path << "\n";
 
             uncertainty_spread_sim.run(uncertainty_spread_path);
+        }
+    }
+
+    // Compare uninformed trader behavior across different fixed spreads.
+    // Signal noise is held constant so only the spread and trader model change.
+    std::vector<double> half_spreads = {0.5, 1.0, 1.5, 2.0, 3.0};
+
+    cfg.signal_noise_std = 1.0;
+
+    for (double half_spread : half_spreads) {
+
+        cfg.base_half_spread = half_spread;
+
+        for (int run = 1; run <= number_of_runs; run++) {
+
+            cfg.seed = starting_seed + run - 1;
+
+            std::string run_number = std::to_string(run);
+
+            // Original uninformed trader.
+            Simulator original_sim(
+                cfg,
+                StrategyType::FixedSpread,
+                UninformedTraderType::Noise
+            );
+
+            std::string original_path =
+                "data/original_spread_" + clean(half_spread) +
+                "_run_" + run_number + ".csv";
+
+            original_sim.run(original_path);
+
+
+            // Price-sensitive uninformed trader.
+            Simulator price_sensitive_sim(
+                cfg,
+                StrategyType::FixedSpread,
+                UninformedTraderType::PriceSensitive
+            );
+
+            std::string price_sensitive_path =
+                "data/price_sensitive_spread_" + clean(half_spread) +
+                "_run_" + run_number + ".csv";
+
+            price_sensitive_sim.run(price_sensitive_path);
         }
     }
 

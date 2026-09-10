@@ -38,6 +38,10 @@ struct Config {
     // Noise traders ignore true value and buy/sell randomly, adding uninformed volume.
     double p_trade_noise = 0.30;
 
+    // Price sensitivity used by the price-sensitive uninformed trader.
+    // Calibrated so that a quote 1.0 away from the signal gives a 0.30 probability of trading.
+    double price_sensitivity_beta = 1.203972804;
+
     // Risk penalty strength used for "risk-adjusted PnL" in the log.
     // Larger values punish holding large inventory more heavily (penalty grows with inventory^2).
     double inventory_penalty_lambda = 0.01;

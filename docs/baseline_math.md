@@ -492,7 +492,7 @@ e^{-\epsilon^2/(2\sigma^2)}
 
 First pull the constant outside the integral:
 
-# \[
+\[
 
 \frac{1}{\sigma\sqrt{2\pi}}
 \int_h^\infty
@@ -548,7 +548,7 @@ e^{-\epsilon^2/(2\sigma^2)}
 -\sigma^2
 \left[
 e^{-\epsilon^2/(2\sigma^2)}
-\right]\_h^\infty.
+\right]_h^\infty.
 \]
 
 As \(\epsilon\) approaches infinity,
@@ -560,7 +560,7 @@ e^{-\epsilon^2/(2\sigma^2)}
 
 Therefore,
 
-# \[
+\[
 
 \sigma^2
 e^{-h^2/(2\sigma^2)}.
@@ -783,12 +783,12 @@ E[\text{edge}\mid\text{execution}]
 =
 \frac{
 P(N)E[\text{edge}\mid N]
-
-- P(I)E[\text{edge}\mid I]
-  }{
-  P(N)+P(I)
-  }.
-  \]
++
+P(I)E[\text{edge}\mid I]
+}{
+P(N)+P(I)
+}.
+\]
 
 The numerator is the expected edge contributed per random round by each possible type of execution.
 
@@ -843,21 +843,22 @@ E[\text{edge}\mid\text{execution}]
 =
 \frac{
 (1-p_I)qh
-
-- 2p_I[1-\Phi(h/\sigma)]
-  \left[
-  h-
-  \frac{
-  \sigma\phi(h/\sigma)
-  }{
-  1-\Phi(h/\sigma)
-  }
-  \right]
-  }{
-  (1-p_I)q
-- 2p_I[1-\Phi(h/\sigma)]
-  }.
-  \]
++
+2p_I[1-\Phi(h/\sigma)]
+\left[
+h-
+\frac{
+\sigma\phi(h/\sigma)
+}{
+1-\Phi(h/\sigma)
+}
+\right]
+}{
+(1-p_I)q
++
+2p_I[1-\Phi(h/\sigma)]
+}.
+\]
 
 The informed term simplifies because
 
@@ -877,12 +878,12 @@ Therefore the numerator becomes
 \[
 h\left(
 (1-p_I)q
-
-- 2p_I[1-\Phi(h/\sigma)]
-  \right)
-
-* 2p_I\sigma\phi(h/\sigma).
-  \]
++
+2p_I[1-\Phi(h/\sigma)]
+\right)
+-
+2p_I\sigma\phi(h/\sigma).
+\]
 
 The expression in parentheses is exactly the denominator. Dividing through gives
 
@@ -891,16 +892,16 @@ The expression in parentheses is exactly the denominator. Dividing through gives
 E[\text{edge}\mid\text{execution}]
 =
 h
-
-- \frac{
-  2p_I\sigma\phi(h/\sigma)
-  }{
-  (1-p_I)q
-
-* 2p_I[1-\Phi(h/\sigma)]
-  }
-  }.
-  \]
+-
+\frac{
+2p_I\sigma\phi(h/\sigma)
+}{
+(1-p_I)q
++
+2p_I[1-\Phi(h/\sigma)]
+}
+}.
+\]
 
 This is the mathematical prediction used by `analyze.py` for the fixed spread strategy.
 
@@ -967,10 +968,11 @@ The probability-weighted edge per random round is approximately
 
 \[
 0.18(1)
-
-- # 0.127(-0.525)
-  0.1133.
-  \]
++
+0.127(-0.525)
+\approx
+0.1133.
+\]
 
 The probability that any execution occurs is approximately
 

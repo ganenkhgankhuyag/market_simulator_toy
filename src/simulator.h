@@ -27,6 +27,12 @@ enum class StrategyType {
     UncertaintyAware    // widens spread when signal is noisy
 };
 
+// Identifies which uninformed trader behavior the simulator should use.
+enum class UninformedTraderType {
+    Noise,              // trades randomly without reacting to price
+    PriceSensitive      // reacts to quote prices relative to the noisy signal
+};
+
 class Simulator {
 
     // Purpose:
@@ -37,8 +43,9 @@ class Simulator {
 public:
     // PRE: cfg is defined and contains valid simulation parameters.
     //      strategy specifies which quoting rule to use.
+    //      uninformed_trader specifies which uninformed trader behavior to use.
     // POST: constructs a simulator ready to run with the given setup.
-    Simulator(const Config& cfg, StrategyType strategy);
+    Simulator(const Config& cfg, StrategyType strategy, UninformedTraderType uninformed_trader);
 
     // PRE: out_path specifies the CSV file to write results to.
     // POST: runs the simulation for cfg.T timesteps and writes one row
@@ -52,6 +59,9 @@ private:
 
     // Which quoting strategy to apply at each timestep.
     StrategyType m_strategy;
+
+    // Which uninformed trader behavior to use during this simulation.
+    UninformedTraderType m_uninformed_trader;
 };
 
 #endif // SIMULATOR_H
