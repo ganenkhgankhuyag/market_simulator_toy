@@ -201,7 +201,7 @@ Because the trader has already chosen a side, the relevant price depends on that
 For a trader intending to buy, define
 
 \[
-d\_{\text{buy}}
+d_{\text{buy}}
 =
 \text{ask}-S.
 \]
@@ -213,7 +213,7 @@ A larger value means buying is more expensive relative to the trader's estimate.
 For a trader intending to sell, define
 
 \[
-d\_{\text{sell}}
+d_{\text{sell}}
 =
 S-\text{bid}.
 \]
@@ -239,7 +239,7 @@ and
 Therefore,
 
 \[
-d\_{\text{buy}}
+d_{\text{buy}}
 =
 (S+h)-S
 =
@@ -249,7 +249,7 @@ h
 and
 
 \[
-d\_{\text{sell}}
+d_{\text{sell}}
 =
 S-(S-h)
 =
@@ -260,7 +260,7 @@ Thus, under the fixed-spread strategy,
 
 \[
 \boxed{
-d*{\text{buy}}=d*{\text{sell}}=h
+d_{\text{buy}}=d_{\text{sell}}=h
 }.
 \]
 
@@ -471,7 +471,7 @@ A negative distance means that the quote is actually more favorable than the tra
 For example, for a buyer,
 
 \[
-d\_{\text{buy}}<0
+d_{\text{buy}}<0
 \]
 
 means
@@ -733,9 +733,9 @@ Therefore,
 E[\text{edge per round}]
 =
 P(U)E[\text{edge}\mid U]
-
-- P(I)E[\text{edge}\mid I],
-  \]
++
+P(I)E[\text{edge}\mid I],
+\]
 
 where \(U\) denotes an uninformed execution and \(I\) denotes an informed execution.
 
@@ -810,22 +810,22 @@ Combining the two contributions,
 E[\text{edge per round}]
 =
 (1-p_I)D(h)h
++
+2p_I
+\left[
+1-\Phi\left(\frac{h}{\sigma}\right)
+\right]
+\left[
+h-
+\frac{
+\sigma\phi(h/\sigma)
+}{
+1-\Phi(h/\sigma)
+}
+\right].
+\]
 
-- 2p_I
-  \left[
-  1-\Phi\left(\frac{h}{\sigma}\right)
-  \right]
-  \left[
-  h-
-  \frac{
-  \sigma\phi(h/\sigma)
-  }{
-  1-\Phi(h/\sigma)
-  }
-  \right].
-  \]
-
-The second term can be simplified.
+The informed term can be simplified.
 
 Multiplying through gives
 
@@ -834,9 +834,9 @@ Multiplying through gives
 \left[
 1-\Phi\left(\frac{h}{\sigma}\right)
 \right]h
-
-- 2p_I\sigma\phi\left(\frac{h}{\sigma}\right).
-  \]
+-
+2p_I\sigma\phi\left(\frac{h}{\sigma}\right).
+\]
 
 Therefore,
 
@@ -845,15 +845,15 @@ Therefore,
 E[\text{edge per round}]
 =
 (1-p_I)D(h)h
-
-- 2p_I
-  \left[
-  1-\Phi\left(\frac{h}{\sigma}\right)
-  \right]h
-
-* 2p_I\sigma\phi\left(\frac{h}{\sigma}\right)
-  }.
-  \]
++
+2p_I
+\left[
+1-\Phi\left(\frac{h}{\sigma}\right)
+\right]h
+-
+2p_I\sigma\phi\left(\frac{h}{\sigma}\right)
+}.
+\]
 
 Since
 
@@ -868,17 +868,17 @@ the price-sensitive model becomes
 E[\text{edge per round}]
 =
 (1-p_I)e^{-\beta h}h
++
+2p_I
+\left[
+1-\Phi\left(\frac{h}{\sigma}\right)
+\right]h
+-
+2p_I\sigma\phi\left(\frac{h}{\sigma}\right)
+}.
+\]
 
-- 2p_I
-  \left[
-  1-\Phi\left(\frac{h}{\sigma}\right)
-  \right]h
-
-* 2p_I\sigma\phi\left(\frac{h}{\sigma}\right)
-  }.
-  \]
-
-  ---
+---
 
 ## 14. Comparison With the Original Model
 
@@ -896,14 +896,14 @@ Therefore,
 E[\text{edge per round}]
 =
 (1-p_I)qh
-
-- 2p_I
-  \left[
-  1-\Phi\left(\frac{h}{\sigma}\right)
-  \right]h
-
-* 2p_I\sigma\phi\left(\frac{h}{\sigma}\right).
-  \]
++
+2p_I
+\left[
+1-\Phi\left(\frac{h}{\sigma}\right)
+\right]h
+-
+2p_I\sigma\phi\left(\frac{h}{\sigma}\right).
+\]
 
 The only difference between the two formulas is the uninformed-trade probability:
 
@@ -911,15 +911,15 @@ The only difference between the two formulas is the uninformed-trade probability
 q
 \]
 
-in the original model becomes
+in the original model, compared with
 
 \[
-D(h)=e^{-\beta h}
+e^{-\beta h}
 \]
 
-in the revised model.
+in the price-sensitive model.
 
-This makes the comparison controlled.
+The informed-trader contribution is unchanged.
 
 ---
 
@@ -1180,8 +1180,6 @@ A later model can change the information structure separately by introducing a t
 
 ---
 
----
-
 ## 22. Finding the Best Spread Mathematically
 
 The spread experiment tested only the discrete values
@@ -1216,15 +1214,15 @@ is
 F(h)
 =
 (1-p_I)e^{-\beta h}h
-
-- 2p_I
-  \left[
-  1-\Phi\left(\frac{h}{\sigma}\right)
-  \right]h
-
-* 2p_I\sigma
-  \phi\left(\frac{h}{\sigma}\right).
-  \]
++
+2p_I
+\left[
+1-\Phi\left(\frac{h}{\sigma}\right)
+\right]h
+-
+2p_I\sigma
+\phi\left(\frac{h}{\sigma}\right).
+\]
 
 To find a maximum, we differentiate \(F(h)\) with respect to \(h\).
 
@@ -1312,14 +1310,13 @@ he^{-\beta h}
 \right]
 =
 e^{-\beta h}
-
-- \beta h e^{-\beta h}.
-  \]
+-
+\beta h e^{-\beta h}.
+\]
 
 Factoring out the common exponential term gives
 
-# \[
-
+\[
 e^{-\beta h}(1-\beta h).
 \]
 
@@ -1441,10 +1438,10 @@ becomes
 
 \[
 1-\Phi\left(\frac{h}{\sigma}\right)
-
-- \frac{h}{\sigma}
-  \phi\left(\frac{h}{\sigma}\right).
-  \]
+-
+\frac{h}{\sigma}
+\phi\left(\frac{h}{\sigma}\right).
+\]
 
 Putting \(2p_I\) back gives
 
@@ -1453,14 +1450,14 @@ Putting \(2p_I\) back gives
 2p_I
 \left[
 1-\Phi\left(\frac{h}{\sigma}\right)
+-
+\frac{h}{\sigma}
+\phi\left(\frac{h}{\sigma}\right)
+\right]
+}.
+\]
 
-- \frac{h}{\sigma}
-  \phi\left(\frac{h}{\sigma}\right)
-  \right]
-  }.
-  \]
-
-  ***
+---
 
 ## 25. Differentiating the Second Informed-Trader Term
 
@@ -1543,8 +1540,7 @@ Now multiply by the outside constant:
 
 The two negative signs cancel:
 
-# \[
-
+\[
 2p_I\sigma
 \frac{h}{\sigma^2}
 \phi\left(\frac{h}{\sigma}\right).
@@ -1570,25 +1566,19 @@ Combining all three derivative terms gives
 F'(h)
 =
 (1-p_I)e^{-\beta h}(1-\beta h)
++
+2p_I
+\left[
+1-\Phi\left(\frac{h}{\sigma}\right)
+-
+\frac{h}{\sigma}
+\phi\left(\frac{h}{\sigma}\right)
+\right]
++
+2p_I
+\frac{h}{\sigma}
+\phi\left(\frac{h}{\sigma}\right).
 \]
-
-\[
-
-- 2p_I
-  \left[
-  1-\Phi\left(\frac{h}{\sigma}\right)
-
-* \frac{h}{\sigma}
-  \phi\left(\frac{h}{\sigma}\right)
-  \right]
-  \]
-
-\[
-
-- 2p_I
-  \frac{h}{\sigma}
-  \phi\left(\frac{h}{\sigma}\right).
-  \]
 
 Notice that the terms
 
@@ -1614,13 +1604,13 @@ Therefore they cancel:
 -2p_I
 \frac{h}{\sigma}
 \phi\left(\frac{h}{\sigma}\right)
-
-- 2p_I
-  \frac{h}{\sigma}
-  \phi\left(\frac{h}{\sigma}\right)
-  =
-
-0.  \]
++
+2p_I
+\frac{h}{\sigma}
+\phi\left(\frac{h}{\sigma}\right)
+=
+0.
+\]
 
 This leaves the much simpler derivative
 
@@ -1629,13 +1619,13 @@ This leaves the much simpler derivative
 F'(h)
 =
 (1-p_I)e^{-\beta h}(1-\beta h)
-
-- 2p_I
-  \left[
-  1-\Phi\left(\frac{h}{\sigma}\right)
-  \right]
-  }.
-  \]
++
+2p_I
+\left[
+1-\Phi\left(\frac{h}{\sigma}\right)
+\right]
+}.
+\]
 
 This is the derivative used to locate the best spread predicted by the model.
 
@@ -1655,14 +1645,14 @@ Therefore,
 
 \[
 (1-p_I)e^{-\beta h}(1-\beta h)
-
-- 2p_I
-  \left[
-  1-\Phi\left(\frac{h}{\sigma}\right)
-  \right]
-  =
-
-0.  \]
++
+2p_I
+\left[
+1-\Phi\left(\frac{h}{\sigma}\right)
+\right]
+=
+0.
+\]
 
 Because this equation contains both an exponential function and the normal cumulative distribution function, there is not a simple algebraic rearrangement that isolates \(h\).
 
@@ -1736,7 +1726,7 @@ numerically gives
 
 \[
 \boxed{
-h^\*\approx1.3335
+h^*\approx1.3335
 }.
 \]
 
@@ -1744,7 +1734,7 @@ At this spread,
 
 \[
 \boxed{
-F(h^\*)\approx0.12675
+F(h^*)\approx0.12675
 }.
 \]
 
@@ -1806,12 +1796,12 @@ are held constant.
 
 The resulting optimal spreads are:
 
-| Signal noise \(\sigma\) | Optimal half-spread \(h^\*\) | Maximum predicted edge per round |
-| ----------------------: | ---------------------------: | -------------------------------: |
-|                     0.5 |                       0.9354 |                          0.17722 |
-|                     1.0 |                       1.3335 |                          0.12675 |
-|                     2.0 |                       3.9362 |                          0.00587 |
-|                     4.0 |                      32.2039 |                  approximately 0 |
+| Signal noise \(\sigma\) | Optimal half-spread \(h^*\) | Maximum predicted edge per round |
+|---:|---:|---:|
+| 0.5 | 0.9354 | 0.17722 |
+| 1.0 | 1.3335 | 0.12675 |
+| 2.0 | 3.9362 | 0.00587 |
+| 4.0 | 32.2039 | approximately 0 |
 
 The general pattern is
 
@@ -1908,7 +1898,7 @@ When
 the numerical solution gives
 
 \[
-h^\*\approx32.2039.
+h^*\approx32.2039.
 \]
 
 The predicted edge per round at this point is approximately
@@ -1966,7 +1956,7 @@ It depends on the market maker's level of uncertainty.
 As uncertainty increases,
 
 \[
-h^\*
+h^*
 \]
 
 also increases.
