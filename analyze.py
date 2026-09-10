@@ -8,6 +8,7 @@ from typing import Optional
 BASE_HALF_SPREAD = 1.0
 P_INFORMED = 0.40
 P_TRADE_NOISE = 0.30
+PRICE_SENSITIVITY_BETA = -math.log(P_TRADE_NOISE)
 
 def normal_density(z: float) -> float:
     return (
@@ -48,6 +49,51 @@ def predicted_fixed_edge(noise: float) -> float:
     return (
         h
         - adverse_selection / total_trade_probability
+    )
+
+def predicted_spread_results(
+    trader_model: str,
+    spread: float
+) -> tuple[float, float]:
+
+    noise = 1.0
+    z = spread / noise
+
+    right_tail = 1.0 - normal_cdf(z)
+
+    if trader_model == "original":
+        uninformed_trade_rate = P_TRADE_NOISE
+    else:
+        uninformed_trade_rate = math.exp(
+            -PRICE_SENSITIVITY_BETA * spread
+        )
+
+    noise_edge_per_round = (
+        (1.0 - P_INFORMED)
+        * uninformed_trade_rate
+        * spread
+    )
+
+    informed_edge_per_round = (
+        2.0
+        * P_INFORMED
+        * right_tail
+        * spread
+        -
+        2.0
+        * P_INFORMED
+        * noise
+        * normal_density(z)
+    )
+
+    predicted_edge_per_round = (
+        noise_edge_per_round
+        + informed_edge_per_round
+    )
+
+    return (
+        uninformed_trade_rate,
+        predicted_edge_per_round
     )
 
 def parse_file_info(
@@ -360,6 +406,13 @@ def summarize_spread_runs(results: list[dict]) -> list[dict]:
             if total_uninformed_arrivals else 0.0
         )
 
+        predicted_trade_rate, predicted_edge_per_round = (
+            predicted_spread_results(
+                trader_model,
+                spread
+            )
+        )
+
         summaries.append({
             "trader_model": trader_model,
             "spread": spread,
@@ -368,6 +421,10 @@ def summarize_spread_runs(results: list[dict]) -> list[dict]:
             "avg_edge_per_trade": avg_edge_per_trade,
             "avg_edge_per_round": avg_edge_per_round,
             "uninformed_trade_rate": uninformed_trade_rate,
+            "predicted_uninformed_trade_rate": predicted_trade_rate,
+            "predicted_edge_per_round": predicted_edge_per_round,
+            "edge_per_round_difference":
+                avg_edge_per_round - predicted_edge_per_round,
         })
 
     return summaries
@@ -385,6 +442,9 @@ def write_spread_summary_csv(
         "avg_edge_per_trade",
         "avg_edge_per_round",
         "uninformed_trade_rate",
+        "predicted_uninformed_trade_rate",
+        "predicted_edge_per_round",
+        "edge_per_round_difference",
     ]
 
     with open(out_path, "w", newline="") as f:
