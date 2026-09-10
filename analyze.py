@@ -3,14 +3,17 @@ import sys
 import re
 from typing import Optional
 
-def parse_strategy_and_noise(path: str) -> tuple[str, Optional[float]]:
+def parse_file_info(path: str) -> tuple[str, Optional[float], Optional[int]]:
     """
     Examples:
-      data/fixed_noise_2.csv  -> ("fixed", 2.0)
-      data/skew_noise_0.5.csv -> ("skew", 0.5)
-      data/uncert.csv         -> ("uncert", None)
+      data/fixed_noise_2_run_1.csv    -> ("fixed", 2.0, 1)
+      data/skew_noise_0.5_run_12.csv  -> ("skew", 0.5, 12)
+      data/uncert_noise_4_run_50.csv  -> ("uncert", 4.0, 50)
     """
+
     base = path.split("/")[-1].lower()
+
+    # Determine which strategy produced this file.
     if base.startswith("fixed"):
         strategy = "fixed"
     elif base.startswith("skew"):
@@ -20,9 +23,20 @@ def parse_strategy_and_noise(path: str) -> tuple[str, Optional[float]]:
     else:
         strategy = "unknown"
 
-    m = re.search(r"_noise_([0-9]+(?:\.[0-9]+)?)\.csv$", base)
-    noise = float(m.group(1)) if m else None
-    return strategy, noise
+    # Extract the noise level and repeated run number from the filename.
+    match = re.search(
+        r"_noise_([0-9]+(?:\.[0-9]+)?)_run_([0-9]+)\.csv$",
+        base
+    )
+
+    if match:
+        noise = float(match.group(1))
+        run = int(match.group(2))
+    else:
+        noise = None
+        run = None
+
+    return strategy, noise, run
 
 def analyze(path: str) -> dict:
     trades = 0
@@ -61,12 +75,13 @@ def analyze(path: str) -> dict:
 
     avg_edge = edge_sum / edge_count if edge_count else 0.0
 
-    strategy, noise = parse_strategy_and_noise(path)
+    strategy, noise, run = parse_file_info(path)
 
     return {
         "file": path,
         "strategy": strategy,
         "noise": "" if noise is None else noise,
+        "run": "" if run is None else run,
         "final_pnl": last_pnl,
         "final_risk_adj_pnl": last_risk_adj,
         "max_abs_inventory": max_abs_inv,
@@ -79,6 +94,7 @@ def write_summary_csv(out_path: str, results: list[dict]) -> None:
         "file",
         "strategy",
         "noise",
+        "run",
         "final_pnl",
         "final_risk_adj_pnl",
         "max_abs_inventory",
