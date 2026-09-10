@@ -118,6 +118,51 @@ int main() {
         }
     }
 
+    // Compare uninformed trader behavior across different fixed spreads.
+    // Signal noise is held constant so only the spread and trader model change.
+    std::vector<double> half_spreads = {0.5, 1.0, 1.5, 2.0, 3.0};
+
+    cfg.signal_noise_std = 1.0;
+
+    for (double half_spread : half_spreads) {
+
+        cfg.base_half_spread = half_spread;
+
+        for (int run = 1; run <= number_of_runs; run++) {
+
+            cfg.seed = starting_seed + run - 1;
+
+            std::string run_number = std::to_string(run);
+
+            // Original uninformed trader.
+            Simulator original_sim(
+                cfg,
+                StrategyType::FixedSpread,
+                UninformedTraderType::Noise
+            );
+
+            std::string original_path =
+                "data/original_spread_" + clean(half_spread) +
+                "_run_" + run_number + ".csv";
+
+            original_sim.run(original_path);
+
+
+            // Price-sensitive uninformed trader.
+            Simulator price_sensitive_sim(
+                cfg,
+                StrategyType::FixedSpread,
+                UninformedTraderType::PriceSensitive
+            );
+
+            std::string price_sensitive_path =
+                "data/price_sensitive_spread_" + clean(half_spread) +
+                "_run_" + run_number + ".csv";
+
+            price_sensitive_sim.run(price_sensitive_path);
+        }
+    }
+
     std::cout << "Done. CSVs written to data/.\n";
     return 0;
 }
