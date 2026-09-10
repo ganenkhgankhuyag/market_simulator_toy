@@ -1177,3 +1177,820 @@ These limitations are deliberate.
 This model changes one feature of the original uninformed trader while keeping the rest of the environment controlled.
 
 A later model can change the information structure separately by introducing a trader that receives a better signal than the market maker without directly observing the true value.
+
+---
+
+---
+
+## 22. Finding the Best Spread Mathematically
+
+The spread experiment tested only the discrete values
+
+\[
+h\in\{0.5,1.0,1.5,2.0,3.0\}.
+\]
+
+Among those values, the price-sensitive model produced its largest simulated edge per round at
+
+\[
+h=1.5.
+\]
+
+However, this does not tell us whether \(1.5\) is actually the best spread predicted by the mathematical model.
+
+The expected edge per round is a continuous function of \(h\), so we can instead ask:
+
+> For a given level of signal noise \(\sigma\), what value of \(h\) maximizes expected edge per round?
+
+From the previous derivation,
+
+\[
+F(h)
+=
+E[\text{edge per round}]
+\]
+
+is
+
+\[
+F(h)
+=
+(1-p_I)e^{-\beta h}h
+
+- 2p_I
+  \left[
+  1-\Phi\left(\frac{h}{\sigma}\right)
+  \right]h
+
+* 2p_I\sigma
+  \phi\left(\frac{h}{\sigma}\right).
+  \]
+
+To find a maximum, we differentiate \(F(h)\) with respect to \(h\).
+
+A candidate optimum occurs where
+
+\[
+F'(h)=0.
+\]
+
+---
+
+## 23. Differentiating the Uninformed-Trader Term
+
+The first term is
+
+\[
+(1-p_I)he^{-\beta h}.
+\]
+
+The constant
+
+\[
+1-p_I
+\]
+
+does not depend on \(h\), so we only need to differentiate
+
+\[
+he^{-\beta h}.
+\]
+
+This is a product of
+
+\[
+h
+\]
+
+and
+
+\[
+e^{-\beta h},
+\]
+
+so we use the product rule:
+
+\[
+\frac{d}{dh}[uv]
+=
+u'v+uv'.
+\]
+
+Let
+
+\[
+u=h
+\]
+
+and
+
+\[
+v=e^{-\beta h}.
+\]
+
+Then
+
+\[
+u'=1.
+\]
+
+For the second part,
+
+\[
+\frac{d}{dh}
+e^{-\beta h}
+=
+-\beta e^{-\beta h}.
+\]
+
+Therefore,
+
+\[
+\frac{d}{dh}
+\left[
+he^{-\beta h}
+\right]
+=
+e^{-\beta h}
+
+- \beta h e^{-\beta h}.
+  \]
+
+Factoring out the common exponential term gives
+
+# \[
+
+e^{-\beta h}(1-\beta h).
+\]
+
+Putting the constant \(1-p_I\) back,
+
+\[
+\boxed{
+\frac{d}{dh}
+\left[
+(1-p_I)he^{-\beta h}
+\right]
+=
+(1-p_I)e^{-\beta h}(1-\beta h)
+}.
+\]
+
+---
+
+## 24. Differentiating the First Informed-Trader Term
+
+The next term is
+
+\[
+2p_Ih
+\left[
+1-\Phi\left(\frac{h}{\sigma}\right)
+\right].
+\]
+
+Again, \(2p_I\) is constant with respect to \(h\).
+
+We therefore differentiate
+
+\[
+h
+\left[
+1-\Phi\left(\frac{h}{\sigma}\right)
+\right].
+\]
+
+This is also a product.
+
+Let
+
+\[
+u=h
+\]
+
+and
+
+\[
+v=
+1-\Phi\left(\frac{h}{\sigma}\right).
+\]
+
+Then
+
+\[
+u'=1.
+\]
+
+To find \(v'\), recall that the derivative of the standard normal cumulative distribution function is the standard normal density:
+
+\[
+\Phi'(z)=\phi(z).
+\]
+
+Here the input to \(\Phi\) is
+
+\[
+\frac{h}{\sigma}.
+\]
+
+Therefore, by the chain rule,
+
+\[
+\frac{d}{dh}
+\Phi\left(\frac{h}{\sigma}\right)
+=
+\phi\left(\frac{h}{\sigma}\right)
+\frac{1}{\sigma}.
+\]
+
+Since our expression contains
+
+\[
+1-\Phi\left(\frac{h}{\sigma}\right),
+\]
+
+its derivative is
+
+\[
+-\frac{1}{\sigma}
+\phi\left(\frac{h}{\sigma}\right).
+\]
+
+Therefore,
+
+\[
+v'
+=
+-\frac{1}{\sigma}
+\phi\left(\frac{h}{\sigma}\right).
+\]
+
+Using the product rule,
+
+\[
+\frac{d}{dh}
+\left[
+h
+\left(
+1-\Phi\left(\frac{h}{\sigma}\right)
+\right)
+\right]
+\]
+
+becomes
+
+\[
+1-\Phi\left(\frac{h}{\sigma}\right)
+
+- \frac{h}{\sigma}
+  \phi\left(\frac{h}{\sigma}\right).
+  \]
+
+Putting \(2p_I\) back gives
+
+\[
+\boxed{
+2p_I
+\left[
+1-\Phi\left(\frac{h}{\sigma}\right)
+
+- \frac{h}{\sigma}
+  \phi\left(\frac{h}{\sigma}\right)
+  \right]
+  }.
+  \]
+
+  ***
+
+## 25. Differentiating the Second Informed-Trader Term
+
+The final term is
+
+\[
+-2p_I\sigma
+\phi\left(\frac{h}{\sigma}\right).
+\]
+
+The constant outside the density is
+
+\[
+-2p_I\sigma.
+\]
+
+The standard normal density is
+
+\[
+\phi(z)
+=
+\frac{1}{\sqrt{2\pi}}e^{-z^2/2}.
+\]
+
+Its derivative is
+
+\[
+\boxed{
+\phi'(z)=-z\phi(z)
+}.
+\]
+
+In this case,
+
+\[
+z=\frac{h}{\sigma}.
+\]
+
+Therefore,
+
+\[
+\phi'\left(\frac{h}{\sigma}\right)
+=
+-\frac{h}{\sigma}
+\phi\left(\frac{h}{\sigma}\right).
+\]
+
+However, we are differentiating with respect to \(h\), not with respect to \(z\).
+
+Since
+
+\[
+\frac{d}{dh}
+\left(
+\frac{h}{\sigma}
+\right)
+=
+\frac{1}{\sigma},
+\]
+
+the chain rule gives
+
+\[
+\frac{d}{dh}
+\phi\left(\frac{h}{\sigma}\right)
+=
+-\frac{h}{\sigma^2}
+\phi\left(\frac{h}{\sigma}\right).
+\]
+
+Now multiply by the outside constant:
+
+\[
+-2p_I\sigma
+\left[
+-\frac{h}{\sigma^2}
+\phi\left(\frac{h}{\sigma}\right)
+\right].
+\]
+
+The two negative signs cancel:
+
+# \[
+
+2p_I\sigma
+\frac{h}{\sigma^2}
+\phi\left(\frac{h}{\sigma}\right).
+\]
+
+One factor of \(\sigma\) cancels, giving
+
+\[
+\boxed{
+2p_I
+\frac{h}{\sigma}
+\phi\left(\frac{h}{\sigma}\right)
+}.
+\]
+
+---
+
+## 26. Cancellation in the Derivative
+
+Combining all three derivative terms gives
+
+\[
+F'(h)
+=
+(1-p_I)e^{-\beta h}(1-\beta h)
+\]
+
+\[
+
+- 2p_I
+  \left[
+  1-\Phi\left(\frac{h}{\sigma}\right)
+
+* \frac{h}{\sigma}
+  \phi\left(\frac{h}{\sigma}\right)
+  \right]
+  \]
+
+\[
+
+- 2p_I
+  \frac{h}{\sigma}
+  \phi\left(\frac{h}{\sigma}\right).
+  \]
+
+Notice that the terms
+
+\[
+-2p_I
+\frac{h}{\sigma}
+\phi\left(\frac{h}{\sigma}\right)
+\]
+
+and
+
+\[
++2p_I
+\frac{h}{\sigma}
+\phi\left(\frac{h}{\sigma}\right)
+\]
+
+are exact opposites.
+
+Therefore they cancel:
+
+\[
+-2p_I
+\frac{h}{\sigma}
+\phi\left(\frac{h}{\sigma}\right)
+
+- 2p_I
+  \frac{h}{\sigma}
+  \phi\left(\frac{h}{\sigma}\right)
+  =
+
+0.  \]
+
+This leaves the much simpler derivative
+
+\[
+\boxed{
+F'(h)
+=
+(1-p_I)e^{-\beta h}(1-\beta h)
+
+- 2p_I
+  \left[
+  1-\Phi\left(\frac{h}{\sigma}\right)
+  \right]
+  }.
+  \]
+
+This is the derivative used to locate the best spread predicted by the model.
+
+---
+
+## 27. Solving for the Optimal Spread
+
+The optimal spread is found by solving
+
+\[
+\boxed{
+F'(h)=0
+}.
+\]
+
+Therefore,
+
+\[
+(1-p_I)e^{-\beta h}(1-\beta h)
+
+- 2p_I
+  \left[
+  1-\Phi\left(\frac{h}{\sigma}\right)
+  \right]
+  =
+
+0.  \]
+
+Because this equation contains both an exponential function and the normal cumulative distribution function, there is not a simple algebraic rearrangement that isolates \(h\).
+
+For that reason, the project solves this equation numerically.
+
+The program uses a simple bisection search.
+
+The idea is to start with an interval containing the solution.
+
+The midpoint of the interval is tested.
+
+If
+
+\[
+F'(h)>0,
+\]
+
+then \(F(h)\) is still increasing at that point, so the search moves to larger values of \(h\).
+
+If
+
+\[
+F'(h)<0,
+\]
+
+then \(F(h)\) is decreasing at that point, so the search moves to smaller values of \(h\).
+
+Repeating this process continually cuts the search interval in half until the location where
+
+\[
+F'(h)=0
+\]
+
+is approximated very closely.
+
+The implementation searches within
+
+\[
+0\le h\le50,
+\]
+
+which contains the solutions for all signal-noise levels examined here.
+
+---
+
+## 28. Optimal Spread When \(\sigma=1\)
+
+For the spread experiment,
+
+\[
+p_I=0.40,
+\]
+
+\[
+\beta=-\ln(0.30),
+\]
+
+and
+
+\[
+\sigma=1.
+\]
+
+Solving
+
+\[
+F'(h)=0
+\]
+
+numerically gives
+
+\[
+\boxed{
+h^\*\approx1.3335
+}.
+\]
+
+At this spread,
+
+\[
+\boxed{
+F(h^\*)\approx0.12675
+}.
+\]
+
+This result is consistent with the earlier discrete experiment.
+
+The tested spreads nearest to the mathematical optimum were
+
+\[
+h=1
+\]
+
+and
+
+\[
+h=1.5.
+\]
+
+Their predicted edge per round values were approximately
+
+\[
+F(1)=0.11335
+\]
+
+and
+
+\[
+F(1.5)=0.12444.
+\]
+
+The continuous optimum lies between them at approximately
+
+\[
+h=1.3335.
+\]
+
+Therefore the earlier result that \(h=1.5\) was the best tested spread did not mean that \(1.5\) was the exact mathematical optimum.
+
+It was simply the best point in the discrete set that was tested.
+
+---
+
+## 29. How Signal Uncertainty Changes the Optimal Spread
+
+The same calculation can be repeated while changing the signal-noise level \(\sigma\).
+
+The parameters
+
+\[
+p_I=0.40
+\]
+
+and
+
+\[
+\beta=-\ln(0.30)
+\]
+
+are held constant.
+
+The resulting optimal spreads are:
+
+| Signal noise \(\sigma\) | Optimal half-spread \(h^\*\) | Maximum predicted edge per round |
+| ----------------------: | ---------------------------: | -------------------------------: |
+|                     0.5 |                       0.9354 |                          0.17722 |
+|                     1.0 |                       1.3335 |                          0.12675 |
+|                     2.0 |                       3.9362 |                          0.00587 |
+|                     4.0 |                      32.2039 |                  approximately 0 |
+
+The general pattern is
+
+\[
+\boxed{
+\text{higher signal uncertainty}
+\rightarrow
+\text{wider optimal spread}
+}.
+\]
+
+When the market maker's signal is relatively accurate, such as
+
+\[
+\sigma=0.5,
+\]
+
+it can quote relatively close to its signal while still maintaining positive expected edge.
+
+As the signal becomes less reliable, informed traders have more opportunities to exploit quotes based on large signal errors.
+
+The market maker therefore needs a wider spread to protect itself.
+
+---
+
+## 30. Wider Spreads Do Not Fully Solve the Information Problem
+
+The increase in optimal spread does not mean that increased uncertainty can simply be solved by widening the quotes.
+
+The maximum expected edge also decreases as \(\sigma\) increases.
+
+At
+
+\[
+\sigma=0.5,
+\]
+
+the maximum predicted edge per round is approximately
+
+\[
+0.17722.
+\]
+
+At
+
+\[
+\sigma=1,
+\]
+
+it falls to approximately
+
+\[
+0.12675.
+\]
+
+At
+
+\[
+\sigma=2,
+\]
+
+it falls dramatically to approximately
+
+\[
+0.00587.
+\]
+
+Therefore, although widening the spread protects the market maker from some informed trading, it does not remove the underlying disadvantage created by having a poor estimate of the true value.
+
+The market maker protects itself partly by making trades less likely.
+
+This creates another tradeoff:
+
+\[
+\text{protection from adverse selection}
+\]
+
+versus
+
+\[
+\text{continued participation in the market}.
+\]
+
+---
+
+## 31. Interpreting the \(\sigma=4\) Result
+
+When
+
+\[
+\sigma=4,
+\]
+
+the numerical solution gives
+
+\[
+h^\*\approx32.2039.
+\]
+
+The predicted edge per round at this point is approximately
+
+\[
+1.22\times10^{-16},
+\]
+
+which is effectively zero.
+
+This result should not be interpreted as saying that a half-spread of approximately \(32\) is a practically attractive market-making strategy.
+
+Instead, the result reflects the structure of this toy model.
+
+The market maker's signal has become so noisy that the model finds very little opportunity for positive expected edge.
+
+The extremely wide spread makes uninformed executions almost disappear and also makes informed executions extremely rare.
+
+In this sense, the mathematical optimum is approaching the behavior of not trading.
+
+The market maker is protecting itself from its information disadvantage by posting quotes that almost nobody accepts.
+
+Therefore the more useful interpretation is
+
+\[
+\boxed{
+\text{when uncertainty becomes sufficiently severe,}
+}
+\]
+
+\[
+\boxed{
+\text{the model favors withdrawing from trading rather than}
+}
+\]
+
+\[
+\boxed{
+\text{continuing to quote actively at unfavorable prices.}
+}
+\]
+
+---
+
+## 32. What This Adds to the Model
+
+The original spread experiment showed that making uninformed traders price-sensitive changes the qualitative effect of widening the spread.
+
+The optimization analysis adds another result.
+
+The best spread is not fixed.
+
+It depends on the market maker's level of uncertainty.
+
+As uncertainty increases,
+
+\[
+h^\*
+\]
+
+also increases.
+
+At the same time, the maximum achievable expected edge falls.
+
+Therefore the model suggests two related effects of worsening information:
+
+\[
+\text{greater uncertainty}
+\rightarrow
+\text{more defensive quoting},
+\]
+
+and
+
+\[
+\text{greater uncertainty}
+\rightarrow
+\text{lower useful trading opportunity}.
+\]
+
+This result also motivates the next extension of the project.
+
+So far, one trader knows the exact true value \(V\), while the market maker and the price-sensitive uninformed trader use the noisy signal \(S\).
+
+A later model can weaken this extreme information difference by introducing a `BetterSignalTrader`: a trader that still does not know \(V\), but receives a more accurate noisy signal than the market maker.
