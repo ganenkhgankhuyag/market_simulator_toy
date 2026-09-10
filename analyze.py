@@ -18,6 +18,9 @@ def normal_density(z: float) -> float:
 def normal_cdf(z: float) -> float:
     return 0.5 * (1.0 + math.erf(z / math.sqrt(2.0)))
 
+def normal_right_tail(z: float) -> float:
+    return 0.5 * math.erfc(z / math.sqrt(2.0))
+
 def predicted_fixed_edge(noise: float) -> float:
 
     h = BASE_HALF_SPREAD
@@ -95,6 +98,78 @@ def predicted_spread_results(
         uninformed_trade_rate,
         predicted_edge_per_round
     )
+
+def predicted_price_sensitive_edge_per_round(
+    spread: float,
+    noise: float
+) -> float:
+
+    z = spread / noise
+    right_tail = normal_right_tail(z)
+
+    uninformed_trade_rate = math.exp(
+        -PRICE_SENSITIVITY_BETA * spread
+    )
+
+    uninformed_edge = (
+        (1.0 - P_INFORMED)
+        * uninformed_trade_rate
+        * spread
+    )
+
+    informed_edge = (
+        2.0
+        * P_INFORMED
+        * right_tail
+        * spread
+        -
+        2.0
+        * P_INFORMED
+        * noise
+        * normal_density(z)
+    )
+
+    return uninformed_edge + informed_edge
+
+
+def predicted_edge_derivative(
+    spread: float,
+    noise: float
+) -> float:
+
+    z = spread / noise
+    right_tail = normal_right_tail(z)
+
+    uninformed_part = (
+        (1.0 - P_INFORMED)
+        * math.exp(-PRICE_SENSITIVITY_BETA * spread)
+        * (1.0 - PRICE_SENSITIVITY_BETA * spread)
+    )
+
+    informed_part = (
+        2.0
+        * P_INFORMED
+        * right_tail
+    )
+
+    return uninformed_part + informed_part
+
+
+def find_optimal_spread(noise: float) -> float:
+    low = 0.0
+    high = 50.0
+
+    # The optimum occurs where the derivative changes
+    # from positive to negative.
+    for _ in range(100):
+        middle = (low + high) / 2.0
+
+        if predicted_edge_derivative(middle, noise) > 0.0:
+            low = middle
+        else:
+            high = middle
+
+    return (low + high) / 2.0
 
 def parse_file_info(
     path: str
@@ -454,6 +529,37 @@ def write_spread_summary_csv(
         for row in results:
             w.writerow(row)
 
+def write_optimal_spread_summary(
+    out_path: str,
+    noise_values: list[float]
+) -> None:
+
+    fields = [
+        "noise",
+        "optimal_spread",
+        "predicted_edge_per_round",
+    ]
+
+    with open(out_path, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=fields)
+        w.writeheader()
+
+        for noise in noise_values:
+            optimal_spread = find_optimal_spread(noise)
+
+            predicted_edge = (
+                predicted_price_sensitive_edge_per_round(
+                    optimal_spread,
+                    noise
+                )
+            )
+
+            w.writerow({
+                "noise": noise,
+                "optimal_spread": optimal_spread,
+                "predicted_edge_per_round": predicted_edge,
+            })
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: python3 analyze.py <csv1> <csv2> ...")
@@ -489,6 +595,15 @@ def main():
     )
 
     print("Wrote data/spread_summary.csv")
+
+    noise_values = [0.5, 1.0, 2.0, 4.0]
+
+    write_optimal_spread_summary(
+        "data/optimal_spread_summary.csv",
+        noise_values
+    )
+
+    print("Wrote data/optimal_spread_summary.csv")
 
 if __name__ == "__main__":
     main()
