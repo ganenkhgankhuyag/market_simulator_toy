@@ -36,16 +36,16 @@ public:
     MarketStep step(RNG& rng);
 
     // POST: returns the current true value of the asset.
-    double current_true_value() const { return true_value_; }
+    double current_true_value() const { return m_true_value; }
 
 private:
 
     // Simulation parameters governing value dynamics and signal noise.
-    Config cfg_;
+    Config m_cfg;
 
     // Current true value of the asset.
     // This value evolves over time and is not directly observed by the market maker.
-    double true_value_ = 0.0;
+    double m_true_value = 0.0;
 };
 
 #endif // MARKET_H

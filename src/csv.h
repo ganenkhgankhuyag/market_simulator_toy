@@ -30,12 +30,12 @@ public:
 
     // POST: returns true if the output stream is in a good state (file opened and
     //       no write errors so far). Used to detect file/open/write failures.
-    bool good() const { return out_.good(); }
+    bool good() const { return m_out.good(); }
 
 private:
 
     // Output file stream for the CSV being written.
-    std::ofstream out_;
+    std::ofstream m_out;
 
     // PRE: s is a single cell value (not a whole row).
     // POST: returns a CSV-safe version of s, such that:
